@@ -44,11 +44,18 @@ class Counter extends Component {
     }
 
     onClickIncreamButton() {
-        this.setState({count: this.state.count + 1});
+        this.updateCount(true);
     }
 
     onClickDecreamButton() {
-        this.setState({count: this.state.count -1});
+        this.updateCount(false);
+    }
+
+    updateCount(isIncrement) {
+        const previousValue = this.state.count;
+        const newValue = isIncrement ? previousValue + 1 : previousValue - 1;
+        this.setState({count: newValue})
+        this.props.onUpdate(newValue, previousValue);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -80,12 +87,14 @@ class Counter extends Component {
 //  React v15.5 起，React.PropTypes 已移入另一个包中。请使用 prop-types 库 代替
 Counter.propTypes = {
     caption: PropTypes.string.isRequired,
-    initValue: PropTypes.number
+    initValue: PropTypes.number,
+    onUpdate: PropTypes.func
   };
 
 //定义默认值  
 Counter.defaultProps = {
-    initValue: 12
+    initValue: 0,
+    onUpdate: f => f //什么都不做的函数
 };
 
 export default Counter;
