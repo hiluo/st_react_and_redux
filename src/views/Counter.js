@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import CounterStroe from '../stores/CounterStrore.js';
+import * as Actions from '../Actions.js'
 
 const buttonStyle = {
     margin: '10px'
@@ -19,9 +21,10 @@ class Counter extends Component {
         //tips 2. 成员函数绑定当前对象引用/this
         this.onClickDecreamButton = this.onClickDecreamButton.bind(this);
         this.onClickIncreamButton = this.onClickIncreamButton.bind(this);
+        this.onChange = this.onChange.bind(this);
 
         this.state = {
-            count: props.initValue
+            count: CounterStroe.getCounterValues()[props.caption]
         }
     }
 
@@ -41,21 +44,24 @@ class Counter extends Component {
 
     componentDidMount() {
         console.log('enter componentDidMount, caption is ' + this.props.caption);
+        CounterStroe.addChangeListener(this.onChange);
+    }
+
+    componentWillUnmount() {
+        CounterStroe.removeChangeListener(this.onChange);
     }
 
     onClickIncreamButton() {
-        this.updateCount(true);
+        Actions.increment(this.props.caption);
     }
 
     onClickDecreamButton() {
-        this.updateCount(false);
+        Actions.decrement(this.props.caption);
     }
 
-    updateCount(isIncrement) {
-        const previousValue = this.state.count;
-        const newValue = isIncrement ? previousValue + 1 : previousValue - 1;
-        this.setState({count: newValue})
-        this.props.onUpdate(newValue, previousValue);
+    onChange() {
+        const newCount = CounterStroe.getCounterValues()[this.props.caption];
+        this.setState({count: newCount});
     }
 
     componentWillReceiveProps(nextProps) {
@@ -74,11 +80,12 @@ class Counter extends Component {
 
     render() {
         console.log('enter render, caption is ' + this.props.caption);
+        const {caption} = this.props;
         return(
             <div>
                 <button style={buttonStyle} onClick={this.onClickIncreamButton}>+</button>
                 <button style={buttonStyle} onClick={this.onClickDecreamButton}>-</button>
-                <span>{this.props.caption} count: {this.state.count}</span>
+                <span>{caption} count: {this.state.count}</span>
             </div>
         );
     }
