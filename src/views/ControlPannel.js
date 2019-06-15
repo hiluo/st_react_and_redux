@@ -1,5 +1,6 @@
 import React, { Component} from 'react';
 import Counter from './Counter.js';
+import Summary from './Summary.js';
 
 const style = {
     margin: '20px'
@@ -20,13 +21,10 @@ class ControlPannel extends Component {
     render() {
         return (
             <div style={style}>
-                <Counter caption="First" onUpdate={this.onCounterUpdate} />
-                <Counter caption="Second" onUpdate={this.onCounterUpdate} initValue={this.initValues[1]}/>
-                <Counter caption="Third" onUpdate={this.onCounterUpdate} initValue={this.initValues[2]}/>
-                <button onClick={() => this.forceUpdate()}>
-                    Click me to re-ender!
-                </button>
-                <div>Total Count: {this.state.sum}</div>
+                <Counter caption="First" />
+                <Counter caption="Second" />
+                <Counter caption="Third" />
+                <Summary/>
             </div>
         );
     }
