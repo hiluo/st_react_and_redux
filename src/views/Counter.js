@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import * as Actions from '../Actions.js'
-import store from '../Store.js';
 
 const buttonStyle = {
     margin: '10px'
@@ -36,11 +35,11 @@ Counter.propTypes = {
  */
 class CounterContainer extends Component {
 
-    constructor(props) {
+    constructor(props, context) {
         console.log('enter constructor, caption is ' + props.caption);
 
         //tips 1. 必须要调用父类的构造方法，否则组件不能正常初始化
-        super(props);
+        super(props, context);
         //tips 2. 成员函数绑定当前对象引用/this
         this.onClickDecreamButton = this.onClickDecreamButton.bind(this);
         this.onClickIncreamButton = this.onClickIncreamButton.bind(this);
@@ -52,7 +51,7 @@ class CounterContainer extends Component {
 
     getOwnState() {
         return {
-            value: store.getState()[this.props.caption]
+            value: this.context.store.getState()[this.props.caption]
         }
     }
     
@@ -71,19 +70,19 @@ class CounterContainer extends Component {
 
     componentDidMount() {
         console.log('enter componentDidMount, caption is ' + this.props.caption);
-        store.subscribe(this.onChange);
+        this.context.store.subscribe(this.onChange);
     }
 
     componentWillUnmount() {
-        store.unsubscribe(this.onChange);
+        this.context.store.unsubscribe(this.onChange);
     }
 
     onClickIncreamButton() {
-        store.dispatch(Actions.increment(this.props.caption));
+        this.context.store.dispatch(Actions.increment(this.props.caption));
     }
 
     onClickDecreamButton() {
-        store.dispatch(Actions.decrement(this.props.caption))
+        this.context.store.dispatch(Actions.decrement(this.props.caption))
     }
 
     onChange() {
@@ -110,5 +109,9 @@ class CounterContainer extends Component {
 Counter.propTypes = {
     caption: PropTypes.string.isRequired,
   };
+
+CounterContainer.contextTypes = {
+    store: PropTypes.object
+}
 
 export default CounterContainer;
