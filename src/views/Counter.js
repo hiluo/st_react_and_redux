@@ -6,12 +6,35 @@ import store from '../Store.js';
 const buttonStyle = {
     margin: '10px'
 };
+
+class Counter extends Component {
+    render() {
+        const {caption, onIncrement, onDecrement, value} = this.props;
+
+        return (
+            <div>
+                <button style={buttonStyle} onClick={onIncrement}>+</button>
+                <button style={buttonStyle} onClick={onDecrement}>-</button>
+                <span>{caption} count: {value}</span>
+            </div>
+        );
+    }
+}
+
+Counter.propTypes = {
+    caption: PropTypes.string.isRequired,
+    onIncrement: PropTypes.func.isRequired,
+    onDecrement: PropTypes.func.isRequired,
+    value: PropTypes.number.isRequired
+}
+
+
 /**
  * 1.组件生命周期对应的各个函数的回调
  * 2.组件参数(props)的默认值的使用
  * 3.组件参数有效性的检查
  */
-class Counter extends Component {
+class CounterContainer extends Component {
 
     constructor(props) {
         console.log('enter constructor, caption is ' + props.caption);
@@ -74,14 +97,11 @@ class Counter extends Component {
 
     render() {
         console.log('enter render, caption is ' + this.props.caption);
-        const {caption} = this.props;
-        const value = this.state.value;
         return(
-            <div>
-                <button style={buttonStyle} onClick={this.onClickIncreamButton}>+</button>
-                <button style={buttonStyle} onClick={this.onClickDecreamButton}>-</button>
-                <span>{caption} count: {value}</span>
-            </div>
+            <Counter caption={this.props.caption}
+            onIncrement={this.onClickIncreamButton}
+            onDecrement={this.onClickDecreamButton}
+            value={this.state.value}/>
         );
     }
 }
@@ -91,4 +111,4 @@ Counter.propTypes = {
     caption: PropTypes.string.isRequired,
   };
 
-export default Counter;
+export default CounterContainer;
