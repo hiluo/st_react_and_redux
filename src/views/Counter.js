@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import CounterStroe from '../stores/CounterStrore.js';
 import * as Actions from '../Actions.js'
+import store from '../Store.js';
 
 const buttonStyle = {
     margin: '10px'
@@ -21,13 +21,17 @@ class Counter extends Component {
         //tips 2. 成员函数绑定当前对象引用/this
         this.onClickDecreamButton = this.onClickDecreamButton.bind(this);
         this.onClickIncreamButton = this.onClickIncreamButton.bind(this);
+        this.getOwnState = this.getOwnState.bind(this);
         this.onChange = this.onChange.bind(this);
 
-        this.state = {
-            count: CounterStroe.getCounterValues()[props.caption]
-        }
+        this.state = this.getOwnState();
     }
 
+    getOwnState() {
+        return {
+            value: store.getState()[this.props.caption]
+        }
+    }
     
     // getInitialState() {
     //     console.log('enter getInitialState, caption is ' + this.props.caption);
@@ -44,24 +48,23 @@ class Counter extends Component {
 
     componentDidMount() {
         console.log('enter componentDidMount, caption is ' + this.props.caption);
-        CounterStroe.addChangeListener(this.onChange);
+        store.subscribe(this.onChange);
     }
 
     componentWillUnmount() {
-        CounterStroe.removeChangeListener(this.onChange);
+        store.unsubscribe(this.onChange);
     }
 
     onClickIncreamButton() {
-        Actions.increment(this.props.caption);
+        store.dispatch(Actions.increment(this.props.caption));
     }
 
     onClickDecreamButton() {
-        Actions.decrement(this.props.caption);
+        store.dispatch(Actions.decrement(this.props.caption))
     }
 
     onChange() {
-        const newCount = CounterStroe.getCounterValues()[this.props.caption];
-        this.setState({count: newCount});
+        this.setState(this.getOwnState);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -69,23 +72,15 @@ class Counter extends Component {
         console.log('nextProps, caption is ' + nextProps.caption);
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        console.log('enter shouldComponentUpate, caption is ' + this.props.caption)
-        console.log('nextProps, caption is ' + nextProps.caption);
-        console.log('nextState, count is ' + nextState.count);
-        //, nextProps is ' + nextProps.toString() + ', nextState is ' + nextState.toString());
-        return (nextProps.caption !== this.props.caption) || 
-                (nextState.count !== this.state.count);
-    }
-
     render() {
         console.log('enter render, caption is ' + this.props.caption);
         const {caption} = this.props;
+        const value = this.state.value;
         return(
             <div>
                 <button style={buttonStyle} onClick={this.onClickIncreamButton}>+</button>
                 <button style={buttonStyle} onClick={this.onClickDecreamButton}>-</button>
-                <span>{caption} count: {this.state.count}</span>
+                <span>{caption} count: {value}</span>
             </div>
         );
     }
@@ -94,14 +89,6 @@ class Counter extends Component {
 //  React v15.5 起，React.PropTypes 已移入另一个包中。请使用 prop-types 库 代替
 Counter.propTypes = {
     caption: PropTypes.string.isRequired,
-    initValue: PropTypes.number,
-    onUpdate: PropTypes.func
   };
-
-//定义默认值  
-Counter.defaultProps = {
-    initValue: 0,
-    onUpdate: f => f //什么都不做的函数
-};
 
 export default Counter;

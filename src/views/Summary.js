@@ -1,29 +1,41 @@
 import React, {Component} from 'react';
 
-import SummaryStroe from '../stores/SummaryStrore.js';
+import store from '../Store.js';
 
 class Summary extends Component {
 
     constructor(props) {
         super(props);
 
-        this.onUpdate = this.onUpdate.bind(this);
-
-        this.state = {
-            sum: SummaryStroe.getSummary()
-        }
+        this.onChange = this.onChange.bind(this);
+        this.state = this.getOwnState();
     }
 
-    onUpdate() {
-        this.setState({sum: SummaryStroe.getSummary()});
+    onChange() {
+        this.setState(this.getOwnState());
+    }
+
+    getOwnState() {
+        const state = store.getState();
+        let sum = 0;
+        for (const key in state) {
+            if (state.hasOwnProperty(key)) {
+                sum += state[key];
+            } 
+        }
+        return {sum: sum};
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextProps.sum !== this.state.sum;
     }
 
     componentDidMount() {
-        SummaryStroe.addChangeListener(this.onUpdate);
+        store.subscribe(this.onChange);
     }
 
     componentWillUnmount() {
-        SummaryStroe.removeChangeLister(this.onUpdate);
+        store.unsubscribe(this.onChange);
     }
 
     render() {
